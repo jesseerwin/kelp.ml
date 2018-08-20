@@ -60,8 +60,13 @@ def verify_upload_key(key):
 		return False
 	return True
 
-def get_uid(key):
+def get_uid_from_key(key):
 	cur.execute("SELECT uid FROM users WHERE upload_key=?", (key,))
+	uid = cur.fetchone()
+	return uid[0]
+
+def get_uid_from_username(username):
+	cur.execute("SELECT uid FROM users WHERE username=?", (username,))
 	uid = cur.fetchone()
 	return uid[0]
 
@@ -184,11 +189,7 @@ def upload():
 					#we secure the filename
 					filename = secure_filename(u_file.filename)
 					filetype = filename.rsplit('.', 1)[1]#we get the filetype
-					filename = str(uuid.uuid4())#we generate a filename
-					#Only after generating 1 billion UUIDs every second for the next 100 years,
-					#the probability of creating just one duplicate would be about 50%. The probability
-					#of one duplicate would be about 50% if every person on earth owns 600 million UUIDs.
-					#I'll take it.
+					filename = str(uuid.uuid4())[:8]#i had it longer originally, but that's p unusable
 					
 					
 					path = os.path.dirname(os.path.realpath(__file__))#current directory of program
@@ -196,7 +197,7 @@ def upload():
 					u_file.save(path)
 					
 					#update database
-					uid = get_uid(u_chk)
+					uid = get_uid_from_key(u_chk)
 					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename) VALUES(NULL, ?, ?, ?) ;", (uid, filetype, filename))
 					conn.commit()
 					link = 'http://127.0.0.1:5000/' + filename + '.' + filetype +'\n'
@@ -226,7 +227,24 @@ def uploaded_file(filename):
 	return send_from_directory(path, filename)
 
 
-
+#file deletion will use two routes: one for display, another for deletion
+@app.route('/files')
+def files():
+	#if user has admin level access
+	if session.get('username') != None and get_acc_level(session['username']) == 3:
+		#display all
+		cur.execute("SELECT * FROM files")
+		files=cur.fetchall()
+		return render_template('files.html', session=session, files=files)
+	elif session.get('username') != None:
+		#display only the things that correspond to user's uid
+		username = session.get('username')
+		uid = get_uid_from_username(username)
+		cur.execute("SELECT * FROM files WHERE corr_uid=?", (uid,))
+		files=cur.fetchall()
+		return render_template('files.html', session=session, files=files)
+	else:
+		return render_template('files.html', session=session)
 
 
 if __name__ == '__main__':

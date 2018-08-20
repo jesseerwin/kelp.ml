@@ -33,11 +33,36 @@
 		</div>
 		<p class="separator">-------------------------------------------------------------</p>
 		{% if session['username'] is defined %}
-		<p class="greeting">Here are your files, {{session['username']}}.</p>
+		<p>Here are your files, {{session['username']}}.</p>
+		<a href="/delete/all">delete all files (this can't be undone!)</a>
+		{% if files is defined %}
+			<table>
+				<thead>
+					<th>filename</th>
+					<th>filetype</th>
+					<th></th>
+				</thead>
+				
+					{% for file in files %}
+						<tr>
+							<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[3]}}</a></td>
+							<td>{{file[2]}}</td>
+							<td><a href="/delete/{{file[3]}}.{{file[2]}}">delete</a></td>
+						</tr>
+					{% endfor %}
+				
+				
+				
+			</table>
 		{% else %}
-		<p>wait a miunte, you're not supposed to be here, pls login</p>
+			<p>you don't have any files.</p>
 		{% endif %}
 		
+		{% else %}
+		<p>not logged in.</p>
+		{% endif %}
+		
+
 		</div>
 	</body>
 	

@@ -34,6 +34,15 @@ input{
 	font-size: 1em;
 }
 
+table{
+	border: none;
+	padding: 4px;
+}
+
+th{
+	border-bottom: 1px solid #DDDDDD;
+}
+
 /*CLASSES*/
 .wrapper{
 	
@@ -69,6 +78,7 @@ input{
 	white-space: pre;
 	margin: 5px;
 }
+
 .code{
 	white-space: nowrap;
 	overflow: scroll;
@@ -77,9 +87,19 @@ input{
 	padding: 5px;
 	height: 2em;
 }
+
 .msg{
 	border-left: 1px #DDDDDD solid;
+	padding-left: 3px;
 }
+
+.filename{
+	max-width: 240px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow:ellipsis;
+}
+
 /*ID'S*/
 
 /*===MOBILE===*/
