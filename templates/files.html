@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		<meta name="description" content="kelp's website">
+		<title>kelp's place</title>
+		<link rel="stylesheet" type="text/css" href="static/global.css">
+	</head>
+	<body>
+		<div class="wrapper">
+		<pre class="title">
+      ___           ___           ___       ___     
+     /\__\         /\  \         /\__\     /\  \    
+    /:/  /        /::\  \       /:/  /    /::\  \   
+   /:/__/        /:/\:\  \     /:/  /    /:/\:\  \  
+  /::\__\____   /::\~\:\  \   /:/  /    /::\~\:\  \ 
+ /:/\:::::\__\ /:/\:\ \:\__\ /:/__/    /:/\:\ \:\__\
+ \/_|:|~~|~    \:\~\:\ \/__/ \:\  \    \/__\:\/:/  /
+    |:|  |      \:\ \:\__\    \:\  \        \::/  / 
+    |:|  |       \:\ \/__/     \:\  \        \/__/  
+    |:|  |        \:\__\        \:\__\              
+     \|__|         \/__/         \/__/              
+		</pre>
+		<p class="separator">-------------------------------------------------------------</p>
+		<div class="links">
+			<a href="/">back</a>
+			<a href="/upload">uploads</a>
+			{% if session['username'] is defined %}
+			<a href="/logout">logout</a>
+			{% else %}
+			<a href="/login">login</a>
+			{% endif %}
+		</div>
+		<p class="separator">-------------------------------------------------------------</p>
+		{% if session['username'] is defined %}
+		<p class="greeting">Here are your files, {{session['username']}}.</p>
+		{% else %}
+		<p>wait a miunte, you're not supposed to be here, pls login</p>
+		{% endif %}
+		
+		</div>
+	</body>
+	
+	
+</html>

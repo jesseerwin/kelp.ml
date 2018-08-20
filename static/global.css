@@ -1,0 +1,90 @@
+
+/*FONTS*/
+@font-face{
+	font-family: "main";
+	src: url("D-DIN.otf");
+}
+
+/*===DESKTOP===*/
+
+/*GENERAL ELEMENTS*/
+
+html{
+	font-family: 'main';
+	background-color: #000000;
+	color: #DDDDDD;
+	font-size: 1em;
+}
+
+a{
+	color: #DDDDDD;
+}
+
+a:hover{
+	background-color: #222222;
+}
+
+input{
+	font-family: 'main';
+	background-color: #000000;
+	color: #DDDDDD;
+	border: none;
+	border-bottom: 1px solid #DDDDDD;
+	padding: 4px;
+	font-size: 1em;
+}
+
+/*CLASSES*/
+.wrapper{
+	
+	margin: auto;
+	width: 364px;
+}
+
+.title{
+	white-space: pre;
+	margin-bottom: 0px;
+}
+
+.separator{
+	margin-top: 0px;
+	margin-bottom: 0px;
+	overflow-x: hidden;
+}
+
+.links{
+	text-align: center;
+	width: 100%;
+	display: flex;
+	flex-wrap: no-wrap;
+	justify-content: space-evenly;
+}
+
+.links a{
+	width: 100px;
+	padding: 3px;
+}
+
+.greeting{
+	white-space: pre;
+	margin: 5px;
+}
+.code{
+	white-space: nowrap;
+	overflow: scroll;
+	background-color: #222222;
+	font-family: monospace;
+	padding: 5px;
+	height: 2em;
+}
+.msg{
+	border-left: 1px #DDDDDD solid;
+}
+/*ID'S*/
+
+/*===MOBILE===*/
+/*GENERAL ELEMENTS*/
+
+/*CLASSES*/
+
+/*ID'S*/
