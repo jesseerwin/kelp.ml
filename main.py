@@ -78,6 +78,10 @@ def get_uid_from_username(username):
 @app.route('/')
 def index():
 	return render_template('index.html', session=session)
+	
+@app.route('/rice')
+def rice():
+	return render_template('rice.html', session=session)	
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
