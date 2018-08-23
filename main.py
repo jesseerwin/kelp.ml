@@ -176,7 +176,6 @@ def upload():
 		u_chk = request.form['upload_key']
 		u_file  = request.files['u_file']
 		
-		
 		if not is_empty(u_chk) and u_file:
 				
 			#check if upload key is correct and check if correct filetype
@@ -201,7 +200,10 @@ def upload():
 					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename) VALUES(NULL, ?, ?, ?) ;", (uid, filetype, filename))
 					conn.commit()
 					link = 'http://127.0.0.1:5000/' + filename + '.' + filetype +'\n'
-					return link
+					if request.form.get('u_clean'):
+						return link
+					else:
+						return render_template('upload.html',session=session, u_key=u_chk, link=link)
 				else:
 					msg="unsupported/unallowed file type."
 					return render_template('upload.html',session=session, msg=msg)
