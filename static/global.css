@@ -99,6 +99,9 @@ th{
 	overflow: hidden;
 	text-overflow:ellipsis;
 }
+.files{
+	width: 100%;
+}
 
 /*ID'S*/
 

@@ -26,40 +26,38 @@
 			<a href="/">back</a>
 			<a href="/upload">uploads</a>
 			{% if session['username'] is defined %}
-			<a href="/logout">logout</a>
+				<a href="/logout">logout</a>
 			{% else %}
-			<a href="/login">login</a>
+				<a href="/login">login</a>
 			{% endif %}
 		</div>
 		<p class="separator">-------------------------------------------------------------</p>
 		{% if session['username'] is defined %}
-		<p>Here are your files, {{session['username']}}.</p>
-		<a href="/delete/all">delete all files (this can't be undone!)</a>
-		{% if files is defined %}
-			<table>
-				<thead>
-					<th>filename</th>
-					<th>filetype</th>
-					<th></th>
-				</thead>
-				
-					{% for file in files %}
-						<tr>
-							<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[3]}}</a></td>
-							<td>{{file[2]}}</td>
-							<td><a href="/delete/{{file[3]}}.{{file[2]}}">delete</a></td>
-						</tr>
-					{% endfor %}
-				
-				
-				
-			</table>
-		{% else %}
-			<p>you don't have any files.</p>
-		{% endif %}
+			<p>Here are your files, {{session['username']}}.</p>
+		
+			{% if files is defined %}
+				<a href="/delete/all">delete all files (this can't be undone!)</a>
+				<table class="files">
+					<thead>
+						<th>filename</th>
+						<th>filetype</th>
+						<th></th>
+					</thead>
+					
+						{% for file in files %}
+							<tr>
+								<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[3]}}</a></td>
+								<td>{{file[2]}}</td>
+								<td><a href="/delete/{{file[3]}}.{{file[2]}}">delete</a></td>
+							</tr>
+						{% endfor %}
+				</table>
+			{% else %}
+				<p>you don't have any files.</p>
+			{% endif %}
 		
 		{% else %}
-		<p>not logged in.</p>
+			<p>not logged in.</p>
 		{% endif %}
 		
 

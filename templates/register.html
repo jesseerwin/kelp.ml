@@ -28,10 +28,10 @@
 		</div>
 		<p class="separator">-------------------------------------------------------------</p>
 		{% if msg is defined %}
-		<p class="msg">{{ msg }}</p>
+			<p class="msg">{{ msg }}</p>
 		{% endif %}
 		{% if s_key is defined %}
-		<p class="msg">current invite key: {{ s_key }} </p>
+			<p class="msg">current invite key: {{ s_key }} </p>
 		{% endif %}
 		<form method="post">
 			<p>invite key: <input type=text name=s_key required></p>

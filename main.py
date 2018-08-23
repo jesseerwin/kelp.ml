@@ -11,6 +11,7 @@ import os
 
 
 #init
+domain = "http://127.0.0.1:5000/"
 myctx = CryptContext(schemes=["sha256_crypt", "md5_crypt", "des_crypt"])
 app = Flask(__name__)
 conn = sqlite3.connect('Main.db', check_same_thread=False)
@@ -69,6 +70,8 @@ def get_uid_from_username(username):
 	cur.execute("SELECT uid FROM users WHERE username=?", (username,))
 	uid = cur.fetchone()
 	return uid[0]
+
+
 
 #pages start here
 
@@ -172,6 +175,10 @@ def logout():
 def upload():
 	if request.method == "POST":
 		
+		clean = False
+		
+		if request.form.get('u_clean'):
+			clean = True
 		
 		u_chk = request.form['upload_key']
 		u_file  = request.files['u_file']
@@ -181,6 +188,7 @@ def upload():
 			#check if upload key is correct and check if correct filetype
 			if verify_upload_key(u_chk):
 				if allowed_file(u_file.filename):
+					
 					
 					
 					#actual uploading
@@ -199,20 +207,30 @@ def upload():
 					uid = get_uid_from_key(u_chk)
 					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename) VALUES(NULL, ?, ?, ?) ;", (uid, filetype, filename))
 					conn.commit()
-					link = 'http://127.0.0.1:5000/' + filename + '.' + filetype +'\n'
-					if request.form.get('u_clean'):
+					link = domain + filename + '.' + filetype +'\n'
+					if clean:
 						return link
 					else:
 						return render_template('upload.html',session=session, u_key=u_chk, link=link)
 				else:
-					msg="unsupported/unallowed file type."
-					return render_template('upload.html',session=session, msg=msg)
+					msg="unsupported/unallowed file type\n"
+					if clean:
+						return msg
+					else:	
+						return render_template('upload.html',session=session, msg=msg)
+					
 			else:
-				msg="wrong upload key"
-				return render_template('upload.html',session=session, msg=msg)
+				msg="wrong upload key\n"
+				if clean:
+					return msg
+				else:	
+					return render_template('upload.html',session=session, msg=msg)
 		else:
-			msg="file or upload key not found"
-			return render_template('upload.html',session=session, msg=msg)
+			msg="file or upload key not found\n"
+			if clean:
+				return msg
+			else:	
+				return render_template('upload.html',session=session, msg=msg)
 	else:
 		if session.get('username') != None:
 			#post the upload key to the page if user is logged in
@@ -237,16 +255,51 @@ def files():
 		#display all
 		cur.execute("SELECT * FROM files")
 		files=cur.fetchall()
-		return render_template('files.html', session=session, files=files)
+		if len(files) != 0:
+			return render_template('files.html', session=session, files=files)
+		else:
+			return render_template('files.html', session=session)
 	elif session.get('username') != None:
 		#display only the things that correspond to user's uid
 		username = session.get('username')
 		uid = get_uid_from_username(username)
 		cur.execute("SELECT * FROM files WHERE corr_uid=?", (uid,))
 		files=cur.fetchall()
-		return render_template('files.html', session=session, files=files)
+		if len(files) != 0:
+			return render_template('files.html', session=session, files=files)
+		else:
+			return render_template('files.html', session=session)
 	else:
 		return render_template('files.html', session=session)
+
+@app.route('/delete/<filename>')
+def delete(filename):
+	if session.get('username') != None:
+		print ("authorized")
+		uid = int(get_uid_from_username(session['username']))
+		print (uid)
+		file_location = os.path.dirname(os.path.realpath(__file__)) + app.config['UPLOAD_FOLDER']+filename
+		real_name = filename.rsplit('.', 1)[0]
+		cur.execute("SELECT corr_uid FROM files WHERE filename=?;", (real_name,))
+		check = cur.fetchone()
+		
+		
+		print ("file/user check")
+		print (uid )
+		print (type(uid))
+		print(check[0] )
+		print  (type(check[0]))
+		print (uid == check[0])
+		print (file_location)
+		print (os.path.exists(file_location))
+		
+		if os.path.exists(file_location) and uid == check[0]:
+			print ("success")
+			os.remove(file_location)
+			cur.execute ("DELETE FROM files WHERE filename=?", (real_name,))
+			conn.commit()	
+	return redirect(url_for('files'))
+	
 
 
 if __name__ == '__main__':
