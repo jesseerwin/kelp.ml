@@ -21,7 +21,7 @@
     |:|  |        \:\__\        \:\__\              
      \|__|         \/__/         \/__/              
 		</pre>
-		<p class="separator">-------------------------------------------------------------</p>
+		<p class="separator">-----------------------------------------------------------------</p>
 		<div class="links">
 			<a href="/">back</a>
 			<a href="/upload">uploads</a>
@@ -31,12 +31,11 @@
 				<a href="/login">login</a>
 			{% endif %}
 		</div>
-		<p class="separator">-------------------------------------------------------------</p>
+		<p class="separator">-----------------------------------------------------------------</p>
 		{% if session['username'] is defined %}
 			<p>Here are your files, {{session['username']}}.</p>
 		
 			{% if files is defined %}
-				<a href="/delete/all">delete all files (this can't be undone!)</a>
 				<table class="files">
 					<thead>
 						<th>filename</th>

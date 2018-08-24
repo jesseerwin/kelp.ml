@@ -11,18 +11,18 @@ import os
 
 
 #init
-domain = "http://127.0.0.1:5000/"
+domain = "https://kelp.ml/"
 myctx = CryptContext(schemes=["sha256_crypt", "md5_crypt", "des_crypt"])
 app = Flask(__name__)
 conn = sqlite3.connect('Main.db', check_same_thread=False)
 cur = conn.cursor()
 
 #file setup
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'svg', 'gif','webm', 'pdf', 'md', 'txt', None, 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','webm', 'md', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
 app.config['UPLOAD_FOLDER'] = '/uploads/'
 
 # set the secret key.  keep this really secret:
-app.secret_key = 'CHANGE_THIS_WHEN_IN_PRODUCTION'
+app.secret_key = 'm9YNPPSM49QHfehucF8aspMcU'
 
 
 
@@ -36,9 +36,6 @@ def is_empty(any_structure):
 		return False
 	else:
 		return True
-
-def change_skey():
-	s_key=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20))
 
 def allowed_file(filename):
 	return '.' in filename and \
@@ -150,7 +147,7 @@ def register():
 			#generate password hash
 			hashed_pwd = myctx.hash(password)
 			#change the invite key
-			change_skey()
+			s_key=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20))
 			#create a random upload key
 			upload_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(15))
 			cur.execute("INSERT INTO users (uid, date_added, username, password, access_level, upload_key) VALUES(NULL, ?, ?, ?, ?, ?) ;", (datetime.datetime.now().strftime("%Y-%m-%d"),username,hashed_pwd,1,upload_key))
@@ -279,7 +276,6 @@ def files():
 @app.route('/delete/<filename>')
 def delete(filename):
 	if session.get('username') != None:
-		print ("authorized")
 		uid = int(get_uid_from_username(session['username']))
 		print (uid)
 		file_location = os.path.dirname(os.path.realpath(__file__)) + app.config['UPLOAD_FOLDER']+filename
@@ -287,24 +283,13 @@ def delete(filename):
 		cur.execute("SELECT corr_uid FROM files WHERE filename=?;", (real_name,))
 		check = cur.fetchone()
 		
-		
-		print ("file/user check")
-		print (uid )
-		print (type(uid))
-		print(check[0] )
-		print  (type(check[0]))
-		print (uid == check[0])
-		print (file_location)
-		print (os.path.exists(file_location))
-		
 		if os.path.exists(file_location) and uid == check[0]:
 			print ("success")
 			os.remove(file_location)
 			cur.execute ("DELETE FROM files WHERE filename=?", (real_name,))
 			conn.commit()	
 	return redirect(url_for('files'))
-	
-
+		
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')

@@ -13,7 +13,7 @@ html{
 	font-family: 'main';
 	background-color: #000000;
 	color: #DDDDDD;
-	font-size: 1em;
+	
 }
 
 a{
@@ -43,19 +43,24 @@ th{
 	border-bottom: 1px solid #DDDDDD;
 }
 
+
 /*CLASSES*/
 .wrapper{
 	
 	margin: auto;
-	width: 364px;
+	width: 400px;
 }
 
 .title{
 	white-space: pre;
 	margin-bottom: 0px;
+	text-align: center;
 }
 
 .separator{
+	text-align: center;
+	white-space: nowrap;
+	overflow-x: hidden;
 	margin-top: 0px;
 	margin-bottom: 0px;
 	overflow-x: hidden;
@@ -81,11 +86,16 @@ th{
 
 .code{
 	white-space: nowrap;
-	overflow: scroll;
+	overflow: auto;
 	background-color: #222222;
 	font-family: monospace;
 	padding: 5px;
+	font-size: 0.9em;
 	height: 2em;
+}
+
+.code::-webkit-scrollbar{
+	display: none;
 }
 
 .msg{
