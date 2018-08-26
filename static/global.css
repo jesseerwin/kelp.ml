@@ -49,7 +49,6 @@ th{
 	
 	margin: auto;
 	width: 420px;
-	/*blaze it lol */
 }
 
 .title{
@@ -125,7 +124,7 @@ th{
 	}
 	
 	.title{
-		font-size: 1.8vw;
+		font-size: 2vw;
 	}
 
 }
