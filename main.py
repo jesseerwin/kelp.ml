@@ -122,6 +122,7 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+	global s_key
 	if request.method == "POST":
 		#get all required variables
 		username = request.form['username']
@@ -163,6 +164,7 @@ def register():
 		
 	#if user has admin level access
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
+		
 		return render_template('register.html', session=session, s_key=s_key)
 	
 	return render_template('register.html', session=session)
