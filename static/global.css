@@ -113,11 +113,20 @@ th{
 	width: 100%;
 }
 
-/*ID'S*/
-
 /*===MOBILE===*/
-/*GENERAL ELEMENTS*/
+@media only screen and (max-width: 750px) {
 
-/*CLASSES*/
+	/*GENERAL ELEMENTS*/
+	/*CLASSES*/
+	.wrapper{
+		width: 90%;
+		font-size: 1.5em;
+	}
+	
+	.title{
+		white-space: pre-wrap;
+		font-size: 2vw;
+	}
 
-/*ID'S*/
+}
+
