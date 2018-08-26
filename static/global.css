@@ -48,7 +48,7 @@ th{
 .wrapper{
 	
 	margin: auto;
-	width: 400px;
+	width: 420px;
 }
 
 .title{
@@ -124,7 +124,6 @@ th{
 	}
 	
 	.title{
-		white-space: pre-wrap;
 		font-size: 2vw;
 	}
 
