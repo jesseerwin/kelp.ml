@@ -48,7 +48,8 @@ th{
 .wrapper{
 	
 	margin: auto;
-	width: 400px;
+	width: 420px;
+	/*blaze it lol */
 }
 
 .title{
@@ -124,8 +125,7 @@ th{
 	}
 	
 	.title{
-		white-space: pre-wrap;
-		font-size: 2vw;
+		font-size: 1.8vw;
 	}
 
 }

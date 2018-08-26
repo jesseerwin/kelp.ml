@@ -10,26 +10,26 @@ import uuid
 import os
 
 
-#init
+# init
 domain = "https://kelp.ml/"
 myctx = CryptContext(schemes=["sha256_crypt", "md5_crypt", "des_crypt"])
 app = Flask(__name__)
 conn = sqlite3.connect('Main.db', check_same_thread=False)
 cur = conn.cursor()
 
-#file setup
+# file setup
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','webm', 'md', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
 app.config['UPLOAD_FOLDER'] = '/uploads/'
 
-# set the secret key.  keep this really secret:
-app.secret_key = 'm9YNPPSM49QHfehucF8aspMcU'
+#  set the secret key.  keep this really secret:
+app.secret_key = 'please_change_me'
 
 
 
-#generate an invite key upon startup
+# generate an invite key upon startup
 s_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20))
 
-#functions and whatnot
+# functions and whatnot
 
 def is_empty(any_structure):
 	if any_structure:
@@ -70,7 +70,7 @@ def get_uid_from_username(username):
 
 
 
-#pages start here
+# pages start here
 
 @app.route('/')
 def index():
@@ -78,7 +78,7 @@ def index():
 	
 @app.route('/rice')
 def rice():
-	return render_template('rice.html', session=session)	
+	return render_template('rice.html', session=session)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,25 +90,25 @@ def login():
 			session.pop('username', None)
 			session.pop('password', None)
 			
-			#looking for password in database
+			# looking for password in database
 			cur.execute("SELECT password FROM users WHERE username=?", (username,))
 			
-			#this gets the password (as a tuple, we'll convert it later)
+			# this gets the password (as a tuple, we'll convert it later)
 			enc_psk_tuple = (cur.fetchone())
 			
-			#if user not found
+			# if user not found
 			if is_empty(enc_psk_tuple):
 				msg="user not found"
 				return render_template('login.html', session=session, msg=msg)
 			
 			enc_psk_string ="".join(enc_psk_tuple)
 			
-			#verification
+			# verification
 			if myctx.verify(password, enc_psk_string) == True:
 				session['username'] = username
 				return redirect(url_for('index'))
 			
-			#if wrong password
+			# if wrong password
 			else:
 				msg="wrong password"
 				return render_template('login.html', session=session, msg=msg)
@@ -124,45 +124,45 @@ def login():
 def register():
 	global s_key
 	if request.method == "POST":
-		#get all required variables
+		# get all required variables
 		username = request.form['username']
 		password = request.form['password']
 		s_chk = request.form['s_key']
 		
-		#check if all inputs are filled out
+		# check if all inputs are filled out
 		if not is_empty(username) and not is_empty(password) and not is_empty(s_chk):
-			#check if invite key is correct
+			# check if invite key is correct
 			if s_key != s_chk:
 				msg="invite key not provided"
 				return render_template('register.html', session=session, msg=msg)
 			
-			#check if username already exists
+			# check if username already exists
 			cur.execute("SELECT username FROM users WHERE username=?", (username,))
 			test = cur.fetchone()
 			if test != None:
 				msg="user already exists"
 				return render_template('register.html', session=session, msg=msg)
 			
-			#everything is good, continue registration
+			# everything is good, continue registration
 			
-			#generate password hash
+			# generate password hash
 			hashed_pwd = myctx.hash(password)
-			#change the invite key
+			# change the invite key
 			s_key=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20))
-			#create a random upload key
+			# create a random upload key
 			upload_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(15))
 			cur.execute("INSERT INTO users (uid, date_added, username, password, access_level, upload_key) VALUES(NULL, ?, ?, ?, ?, ?) ;", (datetime.datetime.now().strftime("%Y-%m-%d"),username,hashed_pwd,1,upload_key))
 			conn.commit()
 			return redirect(url_for('login'))
 		
-		#if all inputs aren't filled out
+		# if all inputs aren't filled out
 		else:
 			msg="please fill out all input points"
 			return render_template('register.html', session=session, msg=msg)
 			
 			
 		
-	#if user has admin level access
+	# if user has admin level access
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
 		
 		return render_template('register.html', session=session, s_key=s_key)
@@ -178,8 +178,9 @@ def logout():
 def upload():
 	if request.method == "POST":
 		
-		clean = False
 		
+		# clean output check
+		clean = False
 		if request.form.get('u_clean'):
 			clean = True
 		
@@ -188,25 +189,23 @@ def upload():
 		
 		if not is_empty(u_chk) and u_file:
 				
-			#check if upload key is correct and check if correct filetype
+			# check if upload key is correct and check if correct filetype
 			if verify_upload_key(u_chk):
 				if allowed_file(u_file.filename):
 					
+					# actual uploading
 					
-					
-					#actual uploading
-					
-					#we secure the filename
+					# securing the filename
 					filename = secure_filename(u_file.filename)
-					filetype = filename.rsplit('.', 1)[1]#we get the filetype
-					filename = str(uuid.uuid4())[:8]#i had it longer originally, but that's p unusable
+					filetype = filename.rsplit('.', 1)[1]# we get the filetype
+					filename = str(uuid.uuid4())[:8]# i had it longer originally, but that's p unusable
 					
 					
-					path = os.path.dirname(os.path.realpath(__file__))#current directory of program
+					path = os.path.dirname(os.path.realpath(__file__))# current directory of program
 					path += app.config['UPLOAD_FOLDER'] + filename + '.' + filetype
 					u_file.save(path)
 					
-					#update database
+					# update database
 					uid = get_uid_from_key(u_chk)
 					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename) VALUES(NULL, ?, ?, ?) ;", (uid, filetype, filename))
 					conn.commit()
@@ -226,36 +225,36 @@ def upload():
 				msg="wrong upload key\n"
 				if clean:
 					return msg
-				else:	
+				else:
 					return render_template('upload.html',session=session, msg=msg)
 		else:
 			msg="file or upload key not found\n"
 			if clean:
 				return msg
-			else:	
+			else:
 				return render_template('upload.html',session=session, msg=msg)
 	else:
 		if session.get('username') != None:
-			#post the upload key to the page if user is logged in
+			# post the upload key to the page if user is logged in
 			u_key = get_upload_key(session['username'])
 			return render_template('upload.html',session=session, u_key=u_key)
 		else:
 			return render_template('upload.html',session=session)
 
 
-@app.route('/<filename>') #finds a filename upon getting it's location
+@app.route('/<filename>') # finds a filename upon getting it's location
 def uploaded_file(filename):
-	path = os.path.dirname(os.path.realpath(__file__))#current directory of program
+	path = os.path.dirname(os.path.realpath(__file__))# current directory of program
 	path += app.config['UPLOAD_FOLDER']
 	return send_from_directory(path, filename)
 
 
-#file deletion will use two routes: one for display, another for deletion
+# file deletion will use two routes: one for displaying files, another for deletion
 @app.route('/files')
 def files():
-	#if user has admin level access
+	# if user has admin level access
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
-		#display all
+		# display all
 		cur.execute("SELECT * FROM files")
 		files=cur.fetchall()
 		if len(files) != 0:
@@ -263,36 +262,48 @@ def files():
 		else:
 			return render_template('files.html', session=session)
 	elif session.get('username') != None:
-		#display only the things that correspond to user's uid
+		
+		# display only the things that correspond to user's uid
 		username = session.get('username')
 		uid = get_uid_from_username(username)
 		cur.execute("SELECT * FROM files WHERE corr_uid=?", (uid,))
 		files=cur.fetchall()
+		
 		if len(files) != 0:
 			return render_template('files.html', session=session, files=files)
+		
 		else:
 			return render_template('files.html', session=session)
+	
 	else:
 		return render_template('files.html', session=session)
 
 @app.route('/delete/<filename>')
 def delete(filename):
 	if session.get('username') != None:
+		
+		
 		uid = int(get_uid_from_username(session['username']))
-		print (uid)
+		
+		# get full path of file
 		file_location = os.path.dirname(os.path.realpath(__file__)) + app.config['UPLOAD_FOLDER']+filename
+		
+		# get filename without filetype
 		real_name = filename.rsplit('.', 1)[0]
+		
+		# test if file exists in database
 		cur.execute("SELECT corr_uid FROM files WHERE filename=?;", (real_name,))
 		check = cur.fetchone()
 		
+		
 		if os.path.exists(file_location) and uid == check[0]:
-			print ("success")
+			# delet
 			os.remove(file_location)
 			cur.execute ("DELETE FROM files WHERE filename=?", (real_name,))
-			conn.commit()	
+			conn.commit()
+			
 	return redirect(url_for('files'))
 		
-
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
 

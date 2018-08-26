@@ -1,56 +1,28 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta name="description" content="kelp's website">
-		<title>kelp's place</title>
-		<link rel="stylesheet" type="text/css" href="static/global.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	</head>
-	<body>
-		<div class="wrapper">
-			<pre class="title">
-      ___           ___           ___       ___     
-     /\__\         /\  \         /\__\     /\  \    
-    /:/  /        /::\  \       /:/  /    /::\  \   
-   /:/__/        /:/\:\  \     /:/  /    /:/\:\  \  
-  /::\__\____   /::\~\:\  \   /:/  /    /::\~\:\  \ 
- /:/\:::::\__\ /:/\:\ \:\__\ /:/__/    /:/\:\ \:\__\
- \/_|:|~~|~    \:\~\:\ \/__/ \:\  \    \/__\:\/:/  /
-    |:|  |      \:\ \:\__\    \:\  \        \::/  / 
-    |:|  |       \:\ \/__/     \:\  \        \/__/  
-    |:|  |        \:\__\        \:\__\              
-     \|__|         \/__/         \/__/              
-			</pre>
-			<p class="separator">---------------------------------------------------------------------------------------------------------------------------</p>
-			<div class="links">
-				<a href="/">back</a>
-				<a href="/files">your files</a>
-			</div>
-			<p class="separator">---------------------------------------------------------------------------------------------------------------------------</p>
-			<p>You can upload to this site using curl like so:</p>
-			<div class="code">$curl -F'u_clean=on' -F'upload_key=youruploadkey' -F'u_file=@/path/to/your.file' https://kelp.ml/upload</div>
-			<p>The command above, assuming that everything is correct, will return nothing but a link</p>
-			
-			{% if msg is defined %}
-				<p class="msg">{{ msg }}</p>
-			{% endif %}
-			{% if link is defined %}
-				<p class="msg"><a href={{link}}>{{link}}</a></p>
-			{% endif %}			
-			<form method= post  enctype="multipart/form-data">
-				
-				{% if u_key is defined %}
-					<p>upload key: <input type=text name=upload_key value={{ u_key }} required></p>
-				{% else %}
-					<p>upload key: <input type=text name=upload_key required></p>
-				{% endif %}
-				<p>file: <input type=file style="border: none;" name=u_file required></p>
-				<input type=checkbox name=u_clean style="display: none;">
-				<input type=submit value=upload >
-			</form>
-			
-		</div>
-	</body>
+{% extends "base.html" %}
+{% block links %}
+	<a href="/">back</a>
+	<a href="/files">your files</a>
+{% endblock %}
+{% block content %}
+	<p>You can upload to this site using curl like so:</p>
+	<div class="code">$curl -F'u_clean=on' -F'upload_key=youruploadkey' -F'u_file=@/path/to/your.file' https://kelp.ml/upload</div>
+	<p>The command above, assuming that everything is correct, will return nothing but a link</p>
 	
-	
-</html>
+	{% if msg is defined %}
+		<p class="msg">{{ msg }}</p>
+	{% endif %}
+	{% if link is defined %}
+		<p class="msg"><a href={{link}}>{{link}}</a></p>
+	{% endif %}			
+	<form method= post  enctype="multipart/form-data">
+		
+		{% if u_key is defined %}
+			<p>upload key: <input type=text name=upload_key value={{ u_key }} required></p>
+		{% else %}
+			<p>upload key: <input type=text name=upload_key required></p>
+		{% endif %}
+		<p>file: <input type=file style="border: none;" name=u_file required></p>
+		<input type=checkbox name=u_clean style="display: none;">
+		<input type=submit value=upload >
+	</form>
+{% endblock %}

@@ -1,47 +1,20 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta name="description" content="kelp's website">
-		<title>kelp's place</title>
-		<link rel="stylesheet" type="text/css" href="static/global.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	</head>
-	<body>
-		<div class="wrapper">
-		<pre class="title">
-      ___           ___           ___       ___     
-     /\__\         /\  \         /\__\     /\  \    
-    /:/  /        /::\  \       /:/  /    /::\  \   
-   /:/__/        /:/\:\  \     /:/  /    /:/\:\  \  
-  /::\__\____   /::\~\:\  \   /:/  /    /::\~\:\  \ 
- /:/\:::::\__\ /:/\:\ \:\__\ /:/__/    /:/\:\ \:\__\
- \/_|:|~~|~    \:\~\:\ \/__/ \:\  \    \/__\:\/:/  /
-    |:|  |      \:\ \:\__\    \:\  \        \::/  / 
-    |:|  |       \:\ \/__/     \:\  \        \/__/  
-    |:|  |        \:\__\        \:\__\              
-     \|__|         \/__/         \/__/              
-		</pre>
+{% extends "base.html" %}
+{% block links %}
+	<a href="/rice">rice</a>
+	<a href="/upload">uploads</a>
+	{% if session['username'] is defined %}
+		<a href="/logout">logout</a>
+	{% else %}
+		<a href="/login">login</a>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+	{% if session['username'] is defined %}
+		<p class="greeting">Welcome, {{session['username']}}.       <a href="/files">your files</a></p>
 		<p class="separator">---------------------------------------------------------------------------------------------------------------------------</p>
-		<div class="links">
-			<a href="/rice">rice</a>
-			<a href="/upload">uploads</a>
-			{% if session['username'] is defined %}
-				<a href="/logout">logout</a>
-			{% else %}
-				<a href="/login">login</a>
-			{% endif %}
-		</div>
-		<p class="separator">---------------------------------------------------------------------------------------------------------------------------</p>
-		{% if session['username'] is defined %}
-			<p class="greeting">Welcome, {{session['username']}}.       <a href="/files">your files</a></p>
-			<p class="separator">---------------------------------------------------------------------------------------------------------------------------</p>
-		{% endif %}
-		<p>Welcome to my website. I am a programmer from Lithuania, with interests in graphical design, engineering, and video games. This website also serves as an image hosting site, but since i'm a little short on storage space, you will have to contact me for registration.</p>
-		<p> email: <a href="mailto:nojusr@gmail.com?subject=contakt lil ol kelp">nojusr@gmail.com</a></p>
-		<p>github: <a href="https://github.com/nojusr">https://github.com/nojusr</a></p>
-		
-		</div>
-	</body>
-	
-	
-</html>
+	{% endif %}
+	<p>Welcome to my website. I am a programmer from Lithuania, with interests in graphical design, engineering, and video games. This website also serves as an image hosting site, but since i'm a little short on storage space, you will have to contact me for registration.</p>
+	<p> email: <a href="mailto:nojusr@gmail.com?subject=contakt lil ol kelp">nojusr@gmail.com</a></p>
+	<p>github: <a href="https://github.com/nojusr">https://github.com/nojusr</a></p>
+{% endblock %}
