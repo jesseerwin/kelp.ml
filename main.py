@@ -2,11 +2,12 @@ from flask import Flask, session, redirect, url_for, escape, request, render_tem
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt as mpass
 from passlib.context import CryptContext
+import short_url
 import datetime
 import sqlite3
+import base64
 import random
 import string
-import uuid
 import os
 
 
@@ -198,7 +199,17 @@ def upload():
 					# securing the filename
 					filename = secure_filename(u_file.filename)
 					filetype = filename.rsplit('.', 1)[1]# we get the filetype
-					filename = str(uuid.uuid4())[:8]# i had it longer originally, but that's p unusable
+					realname = filename.rsplit('.', 1)[0]# getting the original filename
+					
+					# encoded filename generation
+					cur.execute("SELECT seq FROM sqlite_sequence WHERE name='files'")
+					curr_id = cur.fetchone()
+					print (curr_id[0])
+					
+					filename = short_url.encode_url((curr_id[0]+1))# uses short_url lib
+					
+					# old method
+					# filename = str(uuid.uuid4())[:8]# i had it longer originally, but that's p unusable
 					
 					
 					path = os.path.dirname(os.path.realpath(__file__))# current directory of program
