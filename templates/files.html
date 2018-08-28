@@ -27,7 +27,13 @@
 				
 					{% for file in files %}
 						<tr>
-							<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[3]}}</a></td>
+							{% if file[4] is none %} 
+								{#backwards compatibility#}
+								<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[3]}}</a></td>
+							{% else %}
+								<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[4]}}</a></td>
+							{% endif %}
+							
 							<td>{{file[2]}}</td>
 							<td><a href="/delete/{{file[3]}}.{{file[2]}}">delete</a></td>
 						</tr>

@@ -218,7 +218,7 @@ def upload():
 					
 					# update database
 					uid = get_uid_from_key(u_chk)
-					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename) VALUES(NULL, ?, ?, ?) ;", (uid, filetype, filename))
+					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename, org_filename) VALUES(NULL, ?, ?, ?, ?) ;", (uid, filetype, filename, realname))
 					conn.commit()
 					link = domain + filename + '.' + filetype +'\n'
 					if clean:
