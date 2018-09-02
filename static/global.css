@@ -104,7 +104,7 @@ th{
 }
 
 .filename{
-	max-width: 240px;
+	max-width: 10em;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow:ellipsis;
