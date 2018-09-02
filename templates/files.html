@@ -29,9 +29,9 @@
 						<tr>
 							{% if file[4] is none %} 
 								{#backwards compatibility#}
-								<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[3]}}</a></td>
+								<td class="filename"><a class="link" href="/{{file[3]}}.{{file[2]}}"><span title="{{file[3]}}">{{file[3]}}</span></a></td>
 							{% else %}
-								<td class="filename"><a href="/{{file[3]}}.{{file[2]}}">{{file[4]}}</a></td>
+								<td class="filename"><a class="link" href="/{{file[3]}}.{{file[2]}}"><span title="{{file[4]}}">{{file[4]}}</span></a></td>
 							{% endif %}
 							
 							<td>{{file[2]}}</td>
@@ -46,6 +46,34 @@
 	{% else %}
 		<p>not logged in.</p>
 	{% endif %}
+	
+	<!-- these scripts, while they do add extra functionality, are entirely unnessecary -->
+	<img src="" id="thumbnail">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+		function checkURL(url) {
+			return(url.match(/\.(jpeg|jpg|gif|png|tiff)$/) != null);
+		}
+		
+		var $thumb = $("#thumbnail"); 
+		$(document).mousemove(function(e) { 
+			$thumb.offset({ top: e.pageY+10, left: e.pageX+10 }); 
+		});
+		
+		$('.link').mouseover(function() {
+			if (checkURL(this.href)){
+				$("#thumbnail").attr("src",this.href);
+			}
+		});
+		$('.link').mouseleave(function() {
+			$("#thumbnail").attr("src", "");
+		});
+		
+		
+	</script>
+	
+	 
+	
 	
 {% endblock %}
 
