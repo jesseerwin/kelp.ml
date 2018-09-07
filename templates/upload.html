@@ -4,6 +4,8 @@
 	<a href="/files">your files</a>
 {% endblock %}
 {% block content %}
+	<p class="stats">Upload stats:   Disk usage:  {{stats[0]}}   Files: {{stats[1]}}   Users: {{stats[2]}} </p>
+	<p class="separator">---------------------------------------------------------------------------------------------------------------------------</p>
 	<p>You can upload to this site using curl like so:</p>
 	<div class="code">$curl -F'u_clean=on' -F'upload_key=youruploadkey' -F'u_file=@/path/to/your.file' https://kelp.ml/upload</div>
 	<p>The command above, assuming that everything is correct, will return nothing but a link</p>

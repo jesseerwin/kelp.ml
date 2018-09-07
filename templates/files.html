@@ -18,6 +18,8 @@
 		<p>Here are your files, {{session['username']}}.</p>
 	
 		{% if files is defined %}
+			<a href="/delete/all">Delete all files (cannot be undone!)</a>
+		
 			<table class="files">
 				<thead>
 					<th>filename</th>

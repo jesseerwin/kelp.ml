@@ -8,6 +8,7 @@ import sqlite3
 import base64
 import random
 import string
+import math
 import os
 
 
@@ -19,7 +20,7 @@ conn = sqlite3.connect('Main.db', check_same_thread=False)
 cur = conn.cursor()
 
 # file setup
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','webm', 'md', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'tiff', 'gif', 'webm', 'md', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
 app.config['UPLOAD_FOLDER'] = '/uploads/'
 
 #  set the secret key.  keep this really secret:
@@ -69,7 +70,24 @@ def get_uid_from_username(username):
 	uid = cur.fetchone()
 	return uid[0]
 
+def get_size(path):
+	total_size = 0
+	for dirpath, dirnames, filenames in os.walk(path):
+		for f in filenames:
+			fp = os.path.join(dirpath, f)
+			total_size += os.path.getsize(fp)
+	return total_size
 
+# found this handy dandy function on ill.fi's source
+# https://github.com/hvze/ill.fi
+def convert_size(size_bytes):
+	if size_bytes == 0:
+		return '0B'
+	size_name = ('b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb', 'yb')
+	i = int(math.floor(math.log(size_bytes, 1024)))
+	p = math.pow(1024, i)
+	s = round(size_bytes / p, 2)
+	return '%s %s' % (s, size_name[i])
 
 # pages start here
 
@@ -177,6 +195,23 @@ def logout():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
+	
+	# get upload stats
+	disk_usage = get_size(os.path.dirname(os.path.realpath(__file__))+app.config['UPLOAD_FOLDER'])
+	disk_usage = convert_size(disk_usage)
+	
+	cur.execute("SELECT * FROM files")
+	count = cur.fetchall()
+	file_amount = len(count)
+	
+	cur.execute("SELECT * FROM users")
+	count = cur.fetchall()
+	usr_amount = len(count)
+	
+	stats = (disk_usage, file_amount, usr_amount)
+	
+	
+	
 	if request.method == "POST":
 		
 		
@@ -199,6 +234,8 @@ def upload():
 					# securing the filename
 					filename = secure_filename(u_file.filename)
 					filetype = filename.rsplit('.', 1)[1]# we get the filetype
+					filetype = filetype.lower()
+					
 					realname = filename.rsplit('.', 1)[0]# getting the original filename
 					
 					# encoded filename generation
@@ -224,20 +261,20 @@ def upload():
 					if clean:
 						return link
 					else:
-						return render_template('upload.html',session=session, u_key=u_chk, link=link)
+						return render_template('upload.html',session=session, u_key=u_chk, link=link, stats=stats)
 				else:
 					msg="unsupported/unallowed file type\n"
 					if clean:
 						return msg
 					else:	
-						return render_template('upload.html',session=session, msg=msg)
+						return render_template('upload.html',session=session, msg=msg, stats=stats)
 					
 			else:
 				msg="wrong upload key\n"
 				if clean:
 					return msg
 				else:
-					return render_template('upload.html',session=session, msg=msg)
+					return render_template('upload.html',session=session, msg=msg, stats=stats)
 		else:
 			msg="file or upload key not found\n"
 			if clean:
@@ -248,9 +285,9 @@ def upload():
 		if session.get('username') != None:
 			# post the upload key to the page if user is logged in
 			u_key = get_upload_key(session['username'])
-			return render_template('upload.html',session=session, u_key=u_key)
+			return render_template('upload.html',session=session, u_key=u_key, stats=stats)
 		else:
-			return render_template('upload.html',session=session)
+			return render_template('upload.html',session=session, stats=stats)
 
 
 @app.route('/<filename>') # finds a filename upon getting it's location
@@ -302,19 +339,47 @@ def delete(filename):
 		# get filename without filetype
 		real_name = filename.rsplit('.', 1)[0]
 		
-		# test if file exists in database
+		# test if file belongs to correct user, and check if exists
 		cur.execute("SELECT corr_uid FROM files WHERE filename=?;", (real_name,))
 		check = cur.fetchone()
 		
-		
-		if os.path.exists(file_location) and uid == check[0]:
-			# delet
+		# if file exists but isnt marked in the database
+		if os.path.exists(file_location) and len(check) == 0:
+			# delete it since it doesn't belong to anyone
 			os.remove(file_location)
+		
+		# if user owns file or user is admin
+		if uid == check[0] or get_acc_level(session['username']) == 3:
+			# delete entry from database, regardless if file exists
 			cur.execute ("DELETE FROM files WHERE filename=?", (real_name,))
 			conn.commit()
+			# delete file if exists
+			if os.path.exists(file_location):
+				os.remove(file_location)
+			
+			
 			
 	return redirect(url_for('files'))
+
+@app.route('/delete/all')
+def deleteall():
+	if session.get('username') != None:
+		uid = int(get_uid_from_username(session['username']))
+		cur.execute("SELECT * FROM files WHERE corr_uid=?",(uid,))
+		files = cur.fetchall()
 		
+		path = os.path.dirname(os.path.realpath(__file__)) + app.config['UPLOAD_FOLDER']
+		
+		
+		#first, delete the files, then delete the database entries
+		for f in files:
+			os.remove(path+f[3]+'.'+f[2])
+		
+		cur.execute("DELETE FROM files WHERE corr_uid=?", (uid,))
+		conn.commit()
+		
+	return redirect(url_for('files'))
+
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
 
