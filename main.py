@@ -305,17 +305,26 @@ def uploaded_file(filename):
 @app.route('/files/', defaults={'page': 1})
 @app.route('/files/<int:page>')
 def files(page):
+	
+	# TEMPTEMPTEMP PLS DELET IF FIX
+	query = ""
+	
 	# if user has admin level access
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
 		# redirect to admin page
-		return redirect(url_for('admin'))
+		# return redirect(url_for('admin'))
+		# admin is still wip
+		query = "SELECT * FROM FILES ORDER BY FID DESC;"
 	elif session.get('username') != None:
+		
+		# temp query befor redirection to other pages
+		query = "SELECT * FROM files WHERE corr_uid=? ORDER BY fid DESC;"
 		
 		# display only the things that correspond to user's uid
 		username = session.get('username')
 		uid = get_uid_from_username(username)
 		
-		cur.execute("SELECT * FROM files WHERE corr_uid=? ORDER BY fid DESC;", (uid,))
+		cur.execute(query, (uid,))
 		temp=cur.fetchall()
 		
 		#paging
