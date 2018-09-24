@@ -16,7 +16,30 @@
 	{% endif %}		
 	{% if session['username'] is defined %}
 		<p>Here are your files, {{session['username']}}.</p>
-	
+		
+		<p>
+			{% if curr_page is defined and page_amount > 0 %}
+				{% if curr_page > 1 %}
+					<a href="{{curr_page-1}}">&lt&lt </a>
+				{% else %}
+					&lt&lt
+				{% endif %}
+				
+				{% for page in range (0, page_amount+1) %}
+					{%if page+1 == curr_page %}
+						{{page+1}}
+					{% else %}
+						<a href="{{page+1}}">{{page+1}}</a>
+					{% endif %}
+				{% endfor %}
+				
+				{% if curr_page <= page_amount %}
+					<a href="{{curr_page+1}}"> &gt&gt</a>
+				{% else %}
+					&gt&gt
+				{% endif %}
+			{% endif %}	
+		</p>
 		{% if files is defined %}
 			<a href="/delete/all">Delete all files (cannot be undone!)</a>
 		
@@ -42,7 +65,7 @@
 					{% endfor %}
 			</table>
 		{% else %}
-			<p>you don't have any files.</p>
+			<p>you don't have any files</p>
 		{% endif %}
 	
 	{% else %}

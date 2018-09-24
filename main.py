@@ -23,6 +23,10 @@ cur = conn.cursor()
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'tiff', 'gif', 'webm', 'md', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
 app.config['UPLOAD_FOLDER'] = '/uploads/'
 
+# paging setup
+app.config['FILES_PER_PAGE'] = 15;
+
+
 #  set the secret key.  keep this really secret:
 app.secret_key = 'please_change_me'
 
@@ -298,33 +302,54 @@ def uploaded_file(filename):
 
 
 # file deletion will use two routes: one for displaying files, another for deletion
-@app.route('/files')
-def files():
+@app.route('/files/', defaults={'page': 1})
+@app.route('/files/<int:page>')
+def files(page):
 	# if user has admin level access
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
-		# display all
-		cur.execute("SELECT * FROM files")
-		files=cur.fetchall()
-		if len(files) != 0:
-			return render_template('files.html', session=session, files=files)
-		else:
-			return render_template('files.html', session=session)
+		# redirect to admin page
+		return redirect(url_for('admin'))
 	elif session.get('username') != None:
 		
 		# display only the things that correspond to user's uid
 		username = session.get('username')
 		uid = get_uid_from_username(username)
-		cur.execute("SELECT * FROM files WHERE corr_uid=?", (uid,))
-		files=cur.fetchall()
+		
+		cur.execute("SELECT * FROM files WHERE corr_uid=? ORDER BY fid DESC;", (uid,))
+		temp=cur.fetchall()
+		
+		#paging
+		
+		
+		
+		# get total amount of posts by user
+		file_amount = len(temp)
+		page_amount = int((file_amount/app.config['FILES_PER_PAGE']))
+		
+		print ((page-1)*app.config['FILES_PER_PAGE'])
+		print ((page-1)*app.config['FILES_PER_PAGE']+app.config['FILES_PER_PAGE'])
+		
+		
+		# this basically gets the correct file links from the 'temp'
+		# array, which has all of the user's posted pages
+		# i honestly didn't think that this would work that well.
+		files = temp[(page-1)*app.config['FILES_PER_PAGE']:(page-1)*app.config['FILES_PER_PAGE']+app.config['FILES_PER_PAGE']]
 		
 		if len(files) != 0:
-			return render_template('files.html', session=session, files=files)
+			return render_template('files.html', session=session, files=files, page_amount=page_amount, curr_page=page)
 		
 		else:
 			return render_template('files.html', session=session)
 	
 	else:
 		return render_template('files.html', session=session)
+
+
+@app.route('/admin')
+def admin():
+	return ('WIP')
+
+
 
 @app.route('/delete/<filename>')
 def delete(filename):
