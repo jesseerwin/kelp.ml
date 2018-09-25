@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="description" content="kelp's website">
+		<title>kelp's place</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='admin.css') }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+	<body>
+		<div class="wrapper">
+			<pre class="title">
+      ___           ___           ___       ___     
+     /\__\         /\  \         /\__\     /\  \    
+    /:/  /        /::\  \       /:/  /    /::\  \   
+   /:/__/        /:/\:\  \     /:/  /    /:/\:\  \  
+  /::\__\____   /::\~\:\  \   /:/  /    /::\~\:\  \ 
+ /:/\:::::\__\ /:/\:\ \:\__\ /:/__/    /:/\:\ \:\__\
+ \/_|:|~~|~    \:\~\:\ \/__/ \:\  \    \/__\:\/:/  /
+    |:|  |      \:\ \:\__\    \:\  \        \::/  / 
+    |:|  |       \:\ \/__/     \:\  \        \/__/  
+    |:|  |        \:\__\        \:\__\              
+     \|__|         \/__/         \/__/              
+			</pre>
+			<p class="separator">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+			<div class="links">
+				<a href="/">back</a>
+				<a href="/upload">upload</a>
+			</div>
+			<p class="separator">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+			<form method="post">
+				 <p>search: 
+					<input type=text name=search_query>
+					sort by:
+					<select name=search_by>
+						<option value="4">filename</option>
+						<option value="3">filetype</option>
+						<option value="0">id</option>
+					</select>
+					<input type=submit value="search">
+				 </p>
+			</form>
+			{% if files is defined %}
+				<table class="files">
+					<thead>
+						<th>id</th>
+						<th>filename</th>
+						<th>filetype</th>
+						<th></th>
+					</thead>
+					{% for file in files %}
+						<tr>
+							<td>{{file[0]}}</td>
+							{% if file[4] is none %} 
+								{#backwards compatibility#}
+								<td class="filename"><a class="link" href="/{{file[3]}}.{{file[2]}}"><span title="{{file[3]}}">{{file[3]}}</span></a></td>
+							{% else %}
+								<td class="filename"><a class="link" href="/{{file[3]}}.{{file[2]}}"><span title="{{file[4]}}">{{file[4]}}</span></a></td>
+							{% endif %}
+							
+							<td>{{file[2]}}</td>
+							<td><a href="/delete/{{file[3]}}.{{file[2]}}">delete</a></td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% else %}
+				<p>you don't have any files</p>
+			{% endif %}
+		
+		</div>
+	</body>
+	
+	
+</html>
+

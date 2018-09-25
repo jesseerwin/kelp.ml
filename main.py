@@ -308,12 +308,12 @@ def files(page):
 	
 	
 	# if user has admin level access
-	#if session.get('username') != None and get_acc_level(session['username']) == 3:
+	if session.get('username') != None and get_acc_level(session['username']) == 3:
 		# redirect to admin page
-		# return redirect(url_for('admin'))
+		return redirect(url_for('admin'))
 		# admin is still wip
-	#elif session.get('username') != None:
-	if session.get('username') != None:
+	elif session.get('username') != None:
+
 		
 		# display only the things that correspond to user's uid
 		username = session.get('username')
@@ -349,9 +349,71 @@ def files(page):
 		return render_template('files.html', session=session)
 
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
-	return ('WIP')
+	if session.get('username') != None and get_acc_level(session['username']) == 3:
+		# both sorting and paging is done in backend.
+		
+		# right now i have 2 methods to approach this
+		# either i could do one query, that fetches all the data and sort out the data in the
+		# program itself, OR
+		# i could assemble a query, let sqlite do the searching/sorting
+		# i already did the second method in an another project, so i think i'll try the first
+		# method this time
+		cur.execute("SELECT * FROM files ORDER BY fid DESC;")
+		temp = cur.fetchall()
+		file_amount = len(temp)
+		
+		if request.method == "POST":
+			
+			
+			# search
+			searchby = request.form.get('search_by')
+			searchquery = request.form['search_query']
+
+			
+			if not is_empty(searchby) and not is_empty(searchquery):
+				i = 0
+				for row in temp: # for each row
+					print (file_amount)
+					print (i)
+					print (row[int(searchby)])
+					print (str(searchquery))
+					print ("--------------------------")
+				
+					if str(row[int(searchby)]) not in str(searchquery): # if item not in search query
+						temp.pop(i)# remove the whole row
+						#i -= 1
+					
+					
+			# orderby
+			orderby = request.form.get('order_by')
+			descasc = request.form.get('desc_asc')
+			
+			#sorted(student_tuples, key=lambda student: student[2])
+			# desc/asc
+			if not is_empty(orderby):
+				if not is_empty(descasc):
+					if descasc == 'asc':
+						temp.sort(key=lambda temp: temp[orderby], reverse=True)
+					else:
+						temp.sort(key=lambda temp: temp[orderby], reverse=False)
+				else:
+					temp.sort(key=lambda temp: temp[orderby], reverse=False)
+		
+		# paging
+		# will implement l8r
+		
+
+
+		
+		files = temp;
+		
+		
+		#return render_template('admin.html', session=session, files=files, pagedata=pagedata, searchdata=searchdata)
+		return render_template('admin.html', session=session, files=files)
+	else:
+		return redirect(url_for('files'))
 
 
 
@@ -376,8 +438,12 @@ def delete(filename):
 		if os.path.exists(file_location) and len(check) == 0:
 			# delete it since it doesn't belong to anyone
 			os.remove(file_location)
-		
+			
 		# if user owns file or user is admin
+		print (uid)
+		print (check[0])
+		print (get_acc_level(session['username']))
+		print (session['username'])
 		if uid == check[0] or get_acc_level(session['username']) == 3:
 			# delete entry from database, regardless if file exists
 			cur.execute ("DELETE FROM files WHERE filename=?", (real_name,))
