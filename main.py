@@ -374,17 +374,23 @@ def admin():
 			
 			if not is_empty(searchby) and not is_empty(searchquery):
 				i = 0
+				temp2 = []
 				for row in temp: # for each row
 					print (file_amount)
 					print (i)
 					print (row[int(searchby)])
 					print (str(searchquery))
+					
+					s = str(row[int(searchby)])
+					sq = str(searchquery)
+					
+					if s.find(sq) != -1: # if item in search query
+						temp2.append(row)# remove the whole row
+						print ("added to new")
 					print ("--------------------------")
 				
-					if str(row[int(searchby)]) not in str(searchquery): # if item not in search query
-						temp.pop(i)# remove the whole row
-						#i -= 1
-					
+				print (temp2)	
+				temp = temp2
 					
 			# orderby
 			orderby = request.form.get('order_by')

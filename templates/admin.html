@@ -33,7 +33,7 @@
 					sort by:
 					<select name=search_by>
 						<option value="4">filename</option>
-						<option value="3">filetype</option>
+						<option value="2">filetype</option>
 						<option value="0">id</option>
 					</select>
 					<input type=submit value="search">
@@ -43,6 +43,7 @@
 				<table class="files">
 					<thead>
 						<th>id</th>
+						<th>url</th>
 						<th>filename</th>
 						<th>filetype</th>
 						<th></th>
@@ -50,6 +51,7 @@
 					{% for file in files %}
 						<tr>
 							<td>{{file[0]}}</td>
+							<td>{{file[3]}}</td>
 							{% if file[4] is none %} 
 								{#backwards compatibility#}
 								<td class="filename"><a class="link" href="/{{file[3]}}.{{file[2]}}"><span title="{{file[3]}}">{{file[3]}}</span></a></td>
