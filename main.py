@@ -20,7 +20,8 @@ conn = sqlite3.connect('Main.db', check_same_thread=False)
 cur = conn.cursor()
 
 # file setup
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'tiff', 'gif', 'webm', 'md', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'tiff', 'gif', 'webm', 'md', 'pptx', 'ppsx', 'odt', 'odp', 'docx', 'xslx', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
+
 app.config['UPLOAD_FOLDER'] = '/uploads/'
 
 # paging setup
