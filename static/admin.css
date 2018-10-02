@@ -48,8 +48,8 @@ img {
 /*CLASSES*/
 .wrapper {
   margin: auto;
-  width: 90%;
-  max-width: 2000px;
+  width: 60%;
+  max-width: 900px;
 }
 
 .title {
@@ -111,15 +111,19 @@ img {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.files {
-  width: 90%;
+.files{
+  float: left;
+  width: 100%;
+  max-width: 900px;
 }
 
-.stats {
+.stats , .actions{
   white-space: pre;
   margin: 0px;
   padding: 3px;
 }
+
+
 
 /* ID'S */
 
@@ -129,4 +133,6 @@ img {
   max-width: 300px;
   max-height: 300px;
 }
+
+
 

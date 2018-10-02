@@ -330,8 +330,6 @@ def files(page):
 		file_amount = len(temp)
 		page_amount = int((file_amount/app.config['FILES_PER_PAGE']))
 		
-		print ((page-1)*app.config['FILES_PER_PAGE'])
-		print ((page-1)*app.config['FILES_PER_PAGE']+app.config['FILES_PER_PAGE'])
 		
 		
 		# this basically gets the correct file links from the 'temp'
@@ -349,75 +347,85 @@ def files(page):
 		return render_template('files.html', session=session)
 
 
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
+# admin page, redirect to this from /files/ if user 
+@app.route('/admin/', defaults={'page': 1}, methods=['GET', 'POST'])
+@app.route('/admin/<int:page>', methods=['GET', 'POST'])
+def admin(page):
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
-		# both sorting and paging is done in backend.
 		
-		# right now i have 2 methods to approach this
-		# either i could do one query, that fetches all the data and sort out the data in the
-		# program itself, OR
-		# i could assemble a query, let sqlite do the searching/sorting
-		# i already did the second method in an another project, so i think i'll try the first
-		# method this time
+		# i decided to use GET args because they're much easier to preserve
+		# than forms and you don't need to recheck your variables, unlike using a session
+		# in hindsight, this is a slightly messy implementation, because i'm passing the same 
+		# data twice (pagedata and searchdata, and the args), gonna have to improve on this
+		
+		args = request.query_string
+		# apparantly flask uses utf8 for its strings, so
+		# we decode it to raw ascii
+		args = args.decode("utf-8")
+		
+		# these are used for preserving the search form and the current page
+		pagedata = [-1] * 2
+		searchdata = [-1] * 4
+		
+		
+		# fetch all files
 		cur.execute("SELECT * FROM files ORDER BY fid DESC;")
 		temp = cur.fetchall()
 		file_amount = len(temp)
+			
+		# search
+		searchby = request.args.get('search_by')
+		searchquery = request.args.get('search_query')
 		
-		if request.method == "POST":
-			
-			
-			# search
-			searchby = request.form.get('search_by')
-			searchquery = request.form['search_query']
-
-			
-			if not is_empty(searchby) and not is_empty(searchquery):
-				i = 0
-				temp2 = []
-				for row in temp: # for each row
-					print (file_amount)
-					print (i)
-					print (row[int(searchby)])
-					print (str(searchquery))
-					
-					s = str(row[int(searchby)])
-					sq = str(searchquery)
-					
-					if s.find(sq) != -1: # if item in search query
-						temp2.append(row)# remove the whole row
-						print ("added to new")
-					print ("--------------------------")
+		print (searchby)
+		
+		if not is_empty(searchby) and not is_empty(searchquery):
+			searchdata[0] = searchby
+			searchdata[1] = searchquery
+			i = 0
+			temp2 = []
+			for row in temp: # for each row
+				s = str(row[int(searchby)])
+				sq = str(searchquery)
 				
-				print (temp2)	
-				temp = temp2
-					
-			# orderby
-			orderby = request.form.get('order_by')
-			descasc = request.form.get('desc_asc')
+				if s.find(sq) != -1: # if item in search query
+					temp2.append(row)# remove the whole row
+				
+			temp = temp2
 			
-			#sorted(student_tuples, key=lambda student: student[2])
-			# desc/asc
-			if not is_empty(orderby):
-				if not is_empty(descasc):
-					if descasc == 'asc':
-						temp.sort(key=lambda temp: temp[orderby], reverse=True)
-					else:
-						temp.sort(key=lambda temp: temp[orderby], reverse=False)
-				else:
-					temp.sort(key=lambda temp: temp[orderby], reverse=False)
+		# try to get the variables required for sorting
+		orderby = request.args.get('order_by')
+		descasc = request.args.get('desc_asc')
+		
+		# check if said variables exist
+		if not is_empty(orderby) and not is_empty(descasc):
+			
+			orderby = int(orderby)
+			
+			searchdata[2] = orderby
+			searchdata[3] = descasc
+			if descasc == 'asc':
+				temp = sorted(temp, key=lambda row: str(row[orderby]), reverse=False)
+			elif descasc == 'desc':
+				temp = sorted(temp, key=lambda row: str(row[orderby]), reverse=True)
+			
 		
 		# paging
-		# will implement l8r
 		
-
-
+		# get total amount of posts
+		file_amount = len(temp)
+		page_amount = int((file_amount/app.config['FILES_PER_PAGE']))
 		
-		files = temp;
+		pagedata[0] = page_amount
+		pagedata[1] = page
 		
 		
-		#return render_template('admin.html', session=session, files=files, pagedata=pagedata, searchdata=searchdata)
-		return render_template('admin.html', session=session, files=files)
+		# see the same line in @app.route(files)
+		files = temp[(page-1)*app.config['FILES_PER_PAGE']:(page-1)*app.config['FILES_PER_PAGE']+app.config['FILES_PER_PAGE']]
+		
+		print (searchdata)
+		
+		return render_template('admin.html', session=session, files=files, searchdata=searchdata, pagedata=pagedata, args=args)
 	else:
 		return redirect(url_for('files'))
 
