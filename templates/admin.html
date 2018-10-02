@@ -38,6 +38,7 @@
 					</select>     order by: <select name=order_by>
 						<option value="4"{% if searchdata[2] == 4 %} selected {% endif %}>filename</option>
 						<option value="2"{% if searchdata[2] == 2 %} selected {% endif %} >filetype</option>
+						<option value="0"{% if searchdata[2] == 0 %} selected {% endif %}>id</option>
 						<option value="1"{% if searchdata[2] == 1 %} selected {% endif %} >user id</option>
 					</select>  <select name=desc_asc>
 						<option value="desc"{% if searchdata[3] == 'desc' %} selected {% endif %} >descending</option>
