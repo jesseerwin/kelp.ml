@@ -378,8 +378,6 @@ def admin(page):
 		searchby = request.args.get('search_by')
 		searchquery = request.args.get('search_query')
 		
-		print (searchby)
-		
 		if not is_empty(searchby) and not is_empty(searchquery):
 			searchdata[0] = searchby
 			searchdata[1] = searchquery
@@ -424,7 +422,6 @@ def admin(page):
 		# see the same line in @app.route(files)
 		files = temp[(page-1)*app.config['FILES_PER_PAGE']:(page-1)*app.config['FILES_PER_PAGE']+app.config['FILES_PER_PAGE']]
 		
-		print (searchdata)
 		
 		return render_template('admin.html', session=session, files=files, searchdata=searchdata, pagedata=pagedata, args=args)
 	else:
