@@ -117,12 +117,20 @@ img {
   max-width: 900px;
 }
 
-.stats , .actions{
+.stats {
   white-space: pre;
   margin: 0px;
   padding: 3px;
 }
-
+.actions {
+  flex-wrap: wrap;
+  align-items: baseline;
+  display: flex;
+  margin: 4px;
+}
+.actions > * {
+  margin-left: 10px;
+}
 
 
 /* ID'S */

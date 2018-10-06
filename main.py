@@ -369,10 +369,12 @@ def admin(page):
 		searchdata = [-1] * 4
 		
 		
-		# fetch all files
-		cur.execute("SELECT * FROM files ORDER BY fid DESC;")
+		# fetch all files with JOIN, since we want to get the actual username
+		cur.execute("SELECT * FROM files INNER JOIN users ON users.uid = files.corr_uid ORDER BY fid DESC;")
 		temp = cur.fetchall()
 		file_amount = len(temp)
+			
+		# actual username = 7
 			
 		# search
 		searchby = request.args.get('search_by')
@@ -395,6 +397,8 @@ def admin(page):
 		# try to get the variables required for sorting
 		orderby = request.args.get('order_by')
 		descasc = request.args.get('desc_asc')
+		
+		
 		
 		# check if said variables exist
 		if not is_empty(orderby) and not is_empty(descasc):

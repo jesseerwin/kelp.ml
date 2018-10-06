@@ -29,40 +29,61 @@
 			<p class="separator">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
 			<form action="{{ url_for('admin') }}">
 				{% if searchdata is defined %}
-				 <p class="actions">search: <input type=text name=search_query {% if searchdata[1] != -1 %}value={{ searchdata[1] }}{% endif %} >     sort by: <select name=search_by>
-						
+				 <div class="actions">
+					    <p>search: 
+					    <input type=text name=search_query {% if searchdata[1] != -1 %}value={{ searchdata[1] }}{% endif %} >
+					    </p> 
+					    
+					    <p>search by: 
+					    <select name=search_by>
 						<option value="4"{% if searchdata[0] == 4 %} selected {% endif %}>filename</option>
 						<option value="2"{% if searchdata[0] == 2 %} selected {% endif %}>filetype</option>
 						<option value="0"{% if searchdata[0] == 0 %} selected {% endif %}>id</option>
 						<option value="1"{% if searchdata[0] == 1 %} selected {% endif %}>user id</option>
-					</select>     order by: <select name=order_by>
+					    </select>
+					    </p>
+					    <p>order by:
+					    <select name=order_by>
 						<option value="4"{% if searchdata[2] == 4 %} selected {% endif %}>filename</option>
 						<option value="2"{% if searchdata[2] == 2 %} selected {% endif %} >filetype</option>
 						<option value="0"{% if searchdata[2] == 0 %} selected {% endif %}>id</option>
 						<option value="1"{% if searchdata[2] == 1 %} selected {% endif %} >user id</option>
-					</select>  <select name=desc_asc>
+					    </select>
+					    </p>  
+					    <select name=desc_asc>
 						<option value="desc"{% if searchdata[3] == 'desc' %} selected {% endif %} >descending</option>
 						<option value="asc"{% if searchdata[3] == 'asc' %} selected {% endif %}>ascending</option>
-					</select>  <input type=submit value="filter">
-					
-				 </p>
+					    </select>
+					    <input type=submit value="filter">
+				 </div>
 				 {% else %}
-				 <p class="actions">search: <input type=text name=search_query {% if searchdata[1] != -1 %}value={{ searchdata[1] }}{% endif %} >     sort by: <select name=search_by>
-						
+				 <div class="actions">
+					    <p>search: 
+					    <input type=text name=search_query>
+					    </p> 
+					    
+					    <p>search by: 
+					    <select name=search_by>
 						<option value="4">filename</option>
 						<option value="2">filetype</option>
 						<option value="0">id</option>
 						<option value="1">user id</option>
-					</select>     order by: <select name=order_by>
+					    </select>
+					    </p>
+					    <p>order by:
+					    <select name=order_by>
 						<option value="4">filename</option>
 						<option value="2">filetype</option>
+						<option value="0">id</option>
 						<option value="1">user id</option>
-					</select>  <select name=desc_asc>
+					    </select>  
+					    </p>
+					    <select name=desc_asc>
 						<option value="desc">descending</option>
 						<option value="asc">ascending</option>
-					</select>  <input type=submit value="filter">
-					
-				 </p>				 
+					    </select>
+					    <input type=submit value="filter">
+				 </div>		 
 				 {% endif %}
 			</form>
 			
@@ -103,7 +124,7 @@
 					{% for file in files %}
 						<tr>
 							<td>{{file[0]}}</td>
-							<td>{{file[1]}}</td>
+							<td>{{file[1]}} ({{file[7]}})</td>
 							<td>{{file[3]}}</td>
 							{% if file[4] is none %} 
 								{#backwards compatibility#}
