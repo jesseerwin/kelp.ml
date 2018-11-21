@@ -15,7 +15,10 @@
 	{% endif %}
 	{% if link is defined %}
 		<p class="msg"><a href={{link}}>{{link}}</a></p>
-	{% endif %}			
+	{% endif %}
+
+	
+	
 	<form method= post  enctype="multipart/form-data">
 		
 		{% if u_key is defined %}
@@ -23,8 +26,54 @@
 		{% else %}
 			<p>upload key: <input type=text name=upload_key required></p>
 		{% endif %}
-		<p>file: <input type=file style="border: none;" name=u_file required></p>
+		<div id="u_file_container" style="cursor: pointer">
+			
+			<input type=file name=u_file required>
+			<p>drag and drop a file here or click to select</p>
+			
+		</div>
+		
 		<input type=checkbox name=u_clean style="display: none;">
 		<input type=submit value=upload >
 	</form>
+	
+	<!-- upload page specific css and scripts-->
+	<style>
+		#u_file_container{
+			margin: auto;
+			text-align: center;
+			height: 6em;
+			border: 1px dashed #dddddd;
+			padding: 5px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+			
+		}
+		#u_file_container input{
+			opacity: 0;
+			height: 100%;
+			width: 100%;
+			outline: none;
+			margin: 0;
+			padding: 0;
+		}
+		#u_file_container p{
+			transform: translate(-0.1em, -4.5em);
+			
+		}
+		
+		#u_file_container:hover, #u_file_container:active {
+			background-color: #222222;
+		}
+		
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			$('#u_file_container input').change(function () {
+				$('#u_file_container p').text(this.files[0].name);
+			});
+		});
+	</script>
+	
 {% endblock %}
