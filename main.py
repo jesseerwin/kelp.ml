@@ -247,7 +247,7 @@ def upload():
 					print (filetype)
 					
 					
-					realname = filename.rsplit('.', 1)[0]# getting the original filename
+					realname = filename.rsplit('.')[0]# getting the original filename
 					
 					# encoded filename generation
 					cur.execute("SELECT seq FROM sqlite_sequence WHERE name='files'")
@@ -450,7 +450,7 @@ def delete(filename):
 		file_location = os.path.dirname(os.path.realpath(__file__)) + app.config['UPLOAD_FOLDER']+filename
 		
 		# get filename without filetype
-		real_name = filename.rsplit('.', 1)[0]
+		real_name = filename.rsplit('.')[0]
 		
 		# test if file belongs to correct user, and check if exists
 		cur.execute("SELECT corr_uid FROM files WHERE filename=?;", (real_name,))
