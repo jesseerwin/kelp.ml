@@ -20,12 +20,13 @@ conn = sqlite3.connect('Main.db', check_same_thread=False)
 cur = conn.cursor()
 
 # file setup
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'tiff', 'gif', 'webm', 'md', 'pptx', 'ppsx', 'odt', 'odp', 'docx', 'xslx', 'txt', 'tar.gz', 'tar.bz2', 'tar.xz', 'tar', 'zip', 'flac', 'mp3', 'mp4'])
+ALLOWED_EXTENSIONS = set(['ttf', 'pdf', 'otf', 'woff', 'woff2','png', 'jpg', 'jpeg', 'klwp', 'tiff', 'gif', 'webm', 'md', 'pptx', 'ppsx', 'odt', 'odp', 'docx', 'xslx', 'txt', 'gz', 'bz2', 'xz', 'tar', 'zip', 'opus', 'flac', 'mp3', 'mp4', 'exe', 'dll'])
+
 
 app.config['UPLOAD_FOLDER'] = '/uploads/'
 
 # paging setup
-app.config['FILES_PER_PAGE'] = 15;
+app.config['FILES_PER_PAGE'] = 29;
 
 
 #  set the secret key.  keep this really secret:
@@ -46,7 +47,8 @@ def is_empty(any_structure):
 
 def allowed_file(filename):
 	return '.' in filename and \
-		filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+		filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
+		
 
 def get_acc_level(user):
 	cur.execute("SELECT access_level FROM users WHERE username=?", (user,))
@@ -238,8 +240,12 @@ def upload():
 					
 					# securing the filename
 					filename = secure_filename(u_file.filename)
-					filetype = filename.rsplit('.', 1)[1]# we get the filetype
+					filetype = filename.rsplit('.')# we get the filetype
+					filetype.pop(0)
+					filetype = '.'.join(filetype)
 					filetype = filetype.lower()
+					print (filetype)
+					
 					
 					realname = filename.rsplit('.', 1)[0]# getting the original filename
 					
