@@ -89,7 +89,7 @@ def get_size(path):
 # https://github.com/hvze/ill.fi
 def convert_size(size_bytes):
 	if size_bytes == 0:
-		return '0B'
+		return '0b'
 	size_name = ('b', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb', 'zb', 'yb')
 	i = int(math.floor(math.log(size_bytes, 1024)))
 	p = math.pow(1024, i)
@@ -101,7 +101,7 @@ def convert_size(size_bytes):
 @app.route('/')
 def index():
 	return render_template('index.html', session=session)
-	
+
 @app.route('/rice')
 def rice():
 	return render_template('rice.html', session=session)
@@ -318,7 +318,6 @@ def files(page):
 	if session.get('username') != None and get_acc_level(session['username']) == 3:
 		# redirect to admin page
 		return redirect(url_for('admin'))
-		# admin is still wip
 	elif session.get('username') != None:
 
 		
@@ -496,6 +495,60 @@ def deleteall():
 		conn.commit()
 		
 	return redirect(url_for('files'))
+
+@app.route('/reset', methods=['GET', 'POST'])
+def reset():
+	if session.get('username') != None:
+		if request.method == "POST":
+			
+			curr_pwd = request.form['curr_pwd']
+			new_pwd = request.form['new_pwd']
+			confirm_pwd = request.form['confirm_pwd']
+			
+			if not is_empty(curr_pwd) and not is_empty(new_pwd) and not is_empty(confirm_pwd):
+				#check if new_pwd is equal to confirm pwd
+				if new_pwd == confirm_pwd:
+					
+					# check if curr_pwd can actually login to the site
+					
+					# looking for password in database
+					cur.execute("SELECT password FROM users WHERE username=?", (session['username'],))
+					
+					# this gets the password (as a tuple, we'll convert it later)
+					enc_psk_tuple = (cur.fetchone())
+					
+					enc_psk_string ="".join(enc_psk_tuple)
+					
+					# verification
+					if myctx.verify(curr_pwd, enc_psk_string) == True:
+						# if everything is in order, rehash the new password and update it in the db
+						
+						new_hashed_pwd = myctx.hash(new_pwd)
+						cur.execute("UPDATE users SET password=? WHERE username=?", (new_hashed_pwd, session['username'],))
+						conn.commit()
+						msg="password changed successfully"
+						return render_template('reset.html', session=session, msg=msg)
+						
+					# if wrong password
+					else:
+						msg="wrong password"
+						return render_template('reset.html', session=session, msg=msg)
+				else:
+					msg="new passwords don't match"
+					return render_template('reset.html', session=session, msg=msg)
+			else:
+				msg="please fill out all input points"
+				return render_template('reset.html', session=session, msg=msg)
+		else:
+			return render_template('reset.html')
+	else:
+		return redirect(url_for('files'))
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+	return render_template('404.html'), 404
+
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')

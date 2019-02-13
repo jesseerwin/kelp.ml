@@ -16,9 +16,6 @@
 	{% if link is defined %}
 		<p class="msg"><a href={{link}}>{{link}}</a></p>
 	{% endif %}
-
-	
-	
 	<form method= post  enctype="multipart/form-data">
 		
 		{% if u_key is defined %}
@@ -29,7 +26,7 @@
 		<div id="u_file_container" style="cursor: pointer">
 			
 			<input type=file name=u_file required>
-			<p>drag and drop a file here or click to select</p>
+			<p>drop a file anywhere on the screen or click here to select a file</p>
 			
 		</div>
 		
@@ -47,6 +44,7 @@
 			padding: 5px;
 			margin-top: 10px;
 			margin-bottom: 10px;
+			cursor: pointer;
 			
 		}
 		#u_file_container input{
@@ -56,22 +54,45 @@
 			outline: none;
 			margin: 0;
 			padding: 0;
+			cursor: pointer;
 		}
 		#u_file_container p{
-			transform: translate(-0.1em, -4.5em);
+			transform: translate(-0.1em, -4.7em);
+			padding-left: 10px;
+			padding-right: 10px;
+			pointer-events: none;
 			
+			cursor: pointer;
 		}
 		
 		#u_file_container:hover, #u_file_container:active {
 			background-color: #222222;
 		}
-		
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script>
 		$(document).ready(function(){
 			$('#u_file_container input').change(function () {
 				$('#u_file_container p').text(this.files[0].name);
+			});
+			$(window).on("dragover", function(event) {
+				event.preventDefault();  
+				event.stopPropagation();
+				$(this).addClass('dragging');
+			});
+
+			$(window).on("dragleave", function(event) {
+				event.preventDefault();  
+				event.stopPropagation();
+				$(this).removeClass('dragging');
+			});
+
+			$(window).on("drop", function(event) {
+				event.preventDefault();  
+				event.stopPropagation();
+				fi = $('#u_file_container input');
+				fi[0].files = event.originalEvent.dataTransfer.files;
+				$('#u_file_container p').text(event.originalEvent.dataTransfer.files[0].name);
 			});
 		});
 	</script>

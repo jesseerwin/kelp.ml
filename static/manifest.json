@@ -1,0 +1,21 @@
+{
+  "short_name": "kelp's place",
+  "name": "kelp's place",
+  "icons": [
+    {
+      "src": "/images/kelp-logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/kelp-logo-large.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#3367D6"
+}

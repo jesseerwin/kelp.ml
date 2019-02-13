@@ -41,8 +41,8 @@
 			{% endif %}	
 		</p>
 		{% if files is defined %}
-			<a href="/delete/all">Delete all files (cannot be undone!)</a>
-		
+			<a href="/delete/all" onclick="return confirm('Do you REALLY want to delet all of your files?')">Delete all files (cannot be undone!)</a>
+			<p><a href="/reset">Reset your password</a></p>
 			<table class="files">
 				<thead>
 					<th>filename</th>
@@ -66,6 +66,7 @@
 			</table>
 		{% else %}
 			<p>you don't have any files</p>
+			<a href="/reset">Reset your password</a>
 		{% endif %}
 	
 	{% else %}
