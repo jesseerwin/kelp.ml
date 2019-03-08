@@ -80,18 +80,24 @@
 			return(url.match(/\.(jpeg|jpg|gif|png|tiff)$/) != null);
 		}
 		
-		var $thumb = $("#thumbnail"); 
+		var thumb = $('#thumbnail'); 
 		$(document).mousemove(function(e) { 
-			$thumb.offset({ top: e.pageY+10, left: e.pageX+10 }); 
+			var imgheight = $('#thumbnail').outerHeight()+10;
+			var dist = Math.floor($(window).height()-e.pageY);
+			if (dist < imgheight+20){
+				thumb.offset({ top: $(window).height()+$(window).scrollTop()-imgheight-10, left: e.pageX+10 }); 
+			}else{
+				thumb.offset({ top: e.pageY+10, left: e.pageX+10 }); 
+			}
 		});
 		
 		$('.link').mouseover(function() {
 			if (checkURL(this.href)){
-				$("#thumbnail").attr("src",this.href);
+				$('#thumbnail').attr("src",this.href);
 			}
 		});
 		$('.link').mouseleave(function() {
-			$("#thumbnail").attr("src", "");
+			$('#thumbnail').attr("src", "");
 		});
 		
 		
