@@ -2,6 +2,7 @@ from flask import Flask, session, redirect, url_for, escape, request, render_tem
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt as mpass
 from passlib.context import CryptContext
+from gi.repository import GExiv2
 import short_url
 import datetime
 import sqlite3
@@ -13,14 +14,15 @@ import os
 
 
 # init
-domain = "https://kelp.ml/"
+domain = "https://unix.media/"
+domain2 = "https://northkoreanregi.me/"
 myctx = CryptContext(schemes=["sha256_crypt", "md5_crypt", "des_crypt"])
 app = Flask(__name__)
 conn = sqlite3.connect('Main.db', check_same_thread=False)
 cur = conn.cursor()
 
 # file setup
-ALLOWED_EXTENSIONS = set(['ttf', 'pdf', 'otf', 'woff', 'woff2','png', 'jpg', 'jpeg', 'klwp', 'tiff', 'gif', 'webm', 'md', 'pptx', 'ppsx', 'odt', 'odp', 'docx', 'xslx', 'txt', 'gz', 'bz2', 'xz', 'tar', 'zip', 'opus', 'flac', 'mp3', 'mp4', 'exe', 'dll'])
+UNALLOWED_EXTENSIONS = set([])
 
 
 app.config['UPLOAD_FOLDER'] = '/uploads/'
@@ -45,9 +47,9 @@ def is_empty(any_structure):
 	else:
 		return True
 
-def allowed_file(filename):
+def unallowed_file(filename):
 	return '.' in filename and \
-		filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
+		filename.rsplit('.', 1)[-1].lower() in UNALLOWED_EXTENSIONS
 		
 
 def get_acc_level(user):
@@ -102,9 +104,9 @@ def convert_size(size_bytes):
 def index():
 	return render_template('index.html', session=session)
 
-@app.route('/rice')
-def rice():
-	return render_template('rice.html', session=session)
+@app.route('/info')
+def info():
+	return render_template('info.html', session=session)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -234,52 +236,65 @@ def upload():
 				
 			# check if upload key is correct and check if correct filetype
 			if verify_upload_key(u_chk):
-				if allowed_file(u_file.filename):
-					
-					# actual uploading
-					
-					# securing the filename
-					filename = secure_filename(u_file.filename)
-					filetype = filename.rsplit('.')# we get the filetype
-					filetype.pop(0)
-					filetype = '.'.join(filetype)
-					filetype = filetype.lower()
-					print (filetype)
-					
-					
-					realname = filename.rsplit('.')[0]# getting the original filename
-					
-					# encoded filename generation
-					cur.execute("SELECT seq FROM sqlite_sequence WHERE name='files'")
-					curr_id = cur.fetchone()
-					print (curr_id[0])
-					
-					filename = short_url.encode_url((curr_id[0]+1))# uses short_url lib
-					
-					# old method
-					# filename = str(uuid.uuid4())[:8]# i had it longer originally, but that's p unusable
-					
-					
-					path = os.path.dirname(os.path.realpath(__file__))# current directory of program
-					path += app.config['UPLOAD_FOLDER'] + filename + '.' + filetype
-					u_file.save(path)
-					
-					# update database
-					uid = get_uid_from_key(u_chk)
-					cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename, org_filename) VALUES(NULL, ?, ?, ?, ?) ;", (uid, filetype, filename, realname))
-					conn.commit()
-					link = domain + filename + '.' + filetype +'\n'
-					if clean:
-						return link
-					else:
-						return render_template('upload.html',session=session, u_key=u_chk, link=link, stats=stats)
+				if unallowed_file(u_file.filename):
+				        msg="unsupported/unallowed file type\n"
+                                        if clean:
+                                                return msg
+                                        else:
+                                                return render_template('upload.html',session=session, msg=msg, stats=stats)
 				else:
-					msg="unsupported/unallowed file type\n"
-					if clean:
-						return msg
-					else:	
-						return render_template('upload.html',session=session, msg=msg, stats=stats)
-					
+      				        # actual uploading
+
+                                        # securing the filename
+                                        filename = secure_filename(u_file.filename)
+                                        filetype = filename.rsplit('.')# we get the filetype
+                                        filetype.pop(0)
+                                        filetype = '.'.join(filetype)
+                                        filetype = filetype.lower()
+                                        print (filetype)
+
+
+                                        realname = filename.rsplit('.')[0]# getting the original filename
+
+                                        # encoded filename generation
+                                        cur.execute("SELECT seq FROM sqlite_sequence WHERE name='files'")
+                                        curr_id = cur.fetchone()
+                                        print (curr_id[0])
+
+                                        filename = short_url.encode_url((curr_id[0]+1))# uses short_url lib
+
+                                        # old method
+                                        # filename = str(uuid.uuid4())[:8]# i had it longer originally, but that's p unusable
+
+
+                                        path = os.path.dirname(os.path.realpath(__file__))# current directory of program
+                                        path += app.config['UPLOAD_FOLDER'] + filename + '.' + filetype
+                                        u_file.save(path)
+
+                                        # update database
+                                        uid = get_uid_from_key(u_chk)
+                                        cur.execute("INSERT INTO files (fid, corr_uid, filetype, filename, org_filename) VALUES(NULL, ?, ?, ?, ?) ;", (uid, filetype, filename, realname))
+                                        if filetype == "jpg":
+                                                exif = GExiv2.Metadata(path)
+                                                exif.clear_exif()
+                                                exif.clear_xmp()
+                                                exif.save_file()
+                                                conn.commit()
+                                        elif filetype == "png":
+                                                exif = GExiv2.Metadata(path)
+                                                exif.clear_exif()
+                                                exif.clear_xmp()
+                                                exif.save_file()
+                                                conn.commit()
+                                        else:
+                                                conn.commit()
+                                        link = domain + filename + '.' + filetype +'\n'
+                                        link2 = domain2 + filename + '.' + filetype +'\n' 
+                                        if clean:
+                                                return link
+                                        else:
+                                                return render_template('upload.html',session=session, u_key=u_chk, link=link, link2=link2, stats=stats)
+	
 			else:
 				msg="wrong upload key\n"
 				if clean:
@@ -552,19 +567,3 @@ def page_not_found(e):
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
